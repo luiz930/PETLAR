@@ -62,14 +62,11 @@ Acesse `http://localhost:3000`.
 
 1. Crie um projeto no Supabase.
 2. Acesse `/configurar-supabase` no PetLar.
-3. Cole a connection string do `Session Pooler`.
-4. Cole a `Project URL`, a `anon public key` e a URL do site.
-5. Em producao na Vercel, informe um token da Vercel e o nome ou ID do projeto.
-6. Marque a opcao para criar tabelas, buckets e politicas RLS.
-7. Salve a configuracao.
-8. Na Vercel, faca `Redeploy` para o site carregar as novas variaveis.
+3. Cole somente a connection string do `Session Pooler`.
+4. Clique em `Salvar e configurar`.
+5. Na Vercel, faca `Redeploy` para o site carregar as novas variaveis.
 
-Em ambiente local, a pagina grava `.env.local`. Em producao, ela grava as variaveis no projeto da Vercel usando o token informado na tela. O token nao e salvo no banco.
+Em ambiente local, a pagina grava `.env.local`. Em producao, para manter a tela com um campo so, o projeto precisa ter `PETLAR_VERCEL_TOKEN` e `PETLAR_VERCEL_PROJECT_ID` configurados uma vez no painel da Vercel.
 
 ## Variaveis de ambiente
 
@@ -80,6 +77,9 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 DATABASE_URL=postgresql://postgres.PROJECT_REF:SUA-SENHA@aws-0-region.pooler.supabase.com:5432/postgres
 SUPABASE_DB_POOLER_URL=postgresql://postgres.PROJECT_REF:SUA-SENHA@aws-0-region.pooler.supabase.com:5432/postgres
 PETLAR_SETUP_PASSWORD=senha-opcional-para-proteger-a-pagina
+PETLAR_VERCEL_TOKEN=token-opcional-para-a-pagina-salvar-na-vercel
+PETLAR_VERCEL_PROJECT_ID=PETLAR
+PETLAR_VERCEL_TEAM_ID=team-opcional
 ```
 
 ## Estrutura de pastas

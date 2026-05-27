@@ -6,16 +6,8 @@ import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
 type SetupPayload = {
-  supabaseUrl?: string;
-  supabaseAnonKey?: string;
-  appUrl?: string;
   databaseUrl?: string;
-  vercelToken?: string;
-  vercelProjectIdOrName?: string;
-  vercelTeamId?: string;
-  vercelTeamSlug?: string;
   setupPassword?: string;
-  applySchema?: boolean;
 };
 
 const ENV_KEYS = [
@@ -35,26 +27,25 @@ function inferSupabaseUrl(databaseUrl: string) {
   return match ? `https://${match[1]}.supabase.co` : "";
 }
 
-function validatePayload(payload: SetupPayload) {
+function validatePayload(payload: SetupPayload, request: Request) {
   const databaseUrl = clean(payload.databaseUrl);
-  const supabaseUrl = clean(payload.supabaseUrl) || inferSupabaseUrl(databaseUrl);
-  const supabaseAnonKey = clean(payload.supabaseAnonKey);
-  const appUrl = clean(payload.appUrl);
+  const supabaseUrl = inferSupabaseUrl(databaseUrl);
+  const supabaseAnonKey = clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const requestOrigin = request.headers.get("origin") || new URL(request.url).origin;
+  const appUrl = clean(process.env.NEXT_PUBLIC_APP_URL) || requestOrigin;
 
   if (!databaseUrl.startsWith("postgresql://")) {
     throw new Error("Cole a connection string completa do Session Pooler.");
   }
 
-  if (!supabaseUrl.startsWith("https://") || !supabaseUrl.includes(".supabase.co")) {
-    throw new Error("Informe uma URL valida do Supabase.");
+  if (!supabaseUrl) {
+    throw new Error("Nao consegui identificar o projeto do Supabase nessa connection string.");
   }
 
-  if (!supabaseAnonKey || supabaseAnonKey.length < 80) {
-    throw new Error("Informe a anon public key do Supabase.");
-  }
-
-  if (!appUrl.startsWith("http://") && !appUrl.startsWith("https://")) {
-    throw new Error("Informe a URL do site, por exemplo https://petlar.vercel.app.");
+  if (!supabaseAnonKey || supabaseAnonKey.includes("sua-chave")) {
+    throw new Error(
+      "A anon public key precisa existir no ambiente antes de usar a tela simples.",
+    );
   }
 
   return {
@@ -71,24 +62,19 @@ async function writeLocalEnv(vars: Record<(typeof ENV_KEYS)[number], string>) {
   await fs.writeFile(path.join(process.cwd(), ".env.local"), content, "utf8");
 }
 
-async function saveVercelEnv(payload: SetupPayload, vars: Record<(typeof ENV_KEYS)[number], string>) {
-  const token = clean(payload.vercelToken);
-  const project = clean(payload.vercelProjectIdOrName);
+async function saveVercelEnv(vars: Record<(typeof ENV_KEYS)[number], string>) {
+  const token = clean(process.env.PETLAR_VERCEL_TOKEN);
+  const project = clean(process.env.PETLAR_VERCEL_PROJECT_ID || process.env.VERCEL_PROJECT_ID);
+  const teamId = clean(process.env.PETLAR_VERCEL_TEAM_ID);
 
-  if (!token) {
-    throw new Error("Informe o token da Vercel para salvar no projeto publicado.");
-  }
-
-  if (!project) {
-    throw new Error("Informe o Project ID ou nome do projeto na Vercel.");
+  if (!token || !project) {
+    throw new Error(
+      "Para salvar no Vercel com um campo so, configure PETLAR_VERCEL_TOKEN e PETLAR_VERCEL_PROJECT_ID uma vez no painel da Vercel.",
+    );
   }
 
   const params = new URLSearchParams({ upsert: "true" });
-  const teamId = clean(payload.vercelTeamId);
-  const slug = clean(payload.vercelTeamSlug);
-
   if (teamId) params.set("teamId", teamId);
-  if (slug) params.set("slug", slug);
 
   const endpoint = `https://api.vercel.com/v10/projects/${encodeURIComponent(project)}/env?${params}`;
   const saved: string[] = [];
@@ -105,7 +91,7 @@ async function saveVercelEnv(payload: SetupPayload, vars: Record<(typeof ENV_KEY
         value: vars[key],
         type: "plain",
         target: ["production", "preview", "development"],
-        comment: "Configurado pela pagina protegida do PetLar",
+        comment: "Configurado pela pagina simples do PetLar",
       }),
     });
 
@@ -145,21 +131,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Senha de configuracao invalida." }, { status: 401 });
     }
 
-    const vars = validatePayload(payload);
+    const vars = validatePayload(payload, request);
     const isVercel = process.env.VERCEL === "1";
-    const saved = isVercel
-      ? await saveVercelEnv(payload, vars)
-      : (await writeLocalEnv(vars), [...ENV_KEYS]);
+    const saved = isVercel ? await saveVercelEnv(vars) : (await writeLocalEnv(vars), [...ENV_KEYS]);
 
-    if (payload.applySchema) {
-      await applySupabaseSchema(vars.DATABASE_URL);
-    }
+    await applySupabaseSchema(vars.DATABASE_URL);
 
     return NextResponse.json({
       ok: true,
       mode: isVercel ? "vercel" : "local",
       saved,
-      schemaApplied: Boolean(payload.applySchema),
+      schemaApplied: true,
       needsRedeploy: isVercel,
     });
   } catch (error) {
