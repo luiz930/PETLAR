@@ -1,0 +1,2 @@
+-- Sem dados de exemplo.
+-- Cadastros, pets, fotos e formulários devem ser criados pelo próprio sistema.
