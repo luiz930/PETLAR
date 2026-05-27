@@ -10,6 +10,9 @@ type SetupPayload = {
   setupPassword?: string;
 };
 
+const DEFAULT_SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxaHV1Y2F0cHpjc3VtamphbGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDUwMDUsImV4cCI6MjA5NTQ4MTAwNX0.E9BrK3AsfDBZ_pGvj3plobKcEHPPu0G296tDuTOHxUw";
+
 const ENV_KEYS = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -27,10 +30,26 @@ function inferSupabaseUrl(databaseUrl: string) {
   return match ? `https://${match[1]}.supabase.co` : "";
 }
 
+function normalizeDatabaseUrl(databaseUrl: string) {
+  const match = databaseUrl.match(/^(postgresql:\/\/[^:]+:)([^@]+)(@.+)$/);
+  if (!match) return databaseUrl;
+
+  const [, prefix, password, suffix] = match;
+  let decodedPassword = password;
+
+  try {
+    decodedPassword = decodeURIComponent(password);
+  } catch {
+    decodedPassword = password;
+  }
+
+  return `${prefix}${encodeURIComponent(decodedPassword)}${suffix}`;
+}
+
 function validatePayload(payload: SetupPayload, request: Request) {
-  const databaseUrl = clean(payload.databaseUrl);
+  const databaseUrl = normalizeDatabaseUrl(clean(payload.databaseUrl));
   const supabaseUrl = inferSupabaseUrl(databaseUrl);
-  const supabaseAnonKey = clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const supabaseAnonKey = clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_ANON_KEY;
   const requestOrigin = request.headers.get("origin") || new URL(request.url).origin;
   const appUrl = clean(process.env.NEXT_PUBLIC_APP_URL) || requestOrigin;
 

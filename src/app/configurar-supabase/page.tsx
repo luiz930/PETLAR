@@ -65,7 +65,7 @@ export default function ConfigurarSupabasePage() {
           <button
             type="submit"
             disabled={loading}
-            className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-5 py-4 text-base font-black text-white transition hover:bg-[var(--primary-dark)] disabled:cursor-not-allowed disabled:opacity-70"
+            className="sticky bottom-4 mt-6 flex min-h-14 w-full items-center justify-center gap-2 rounded-lg bg-[var(--primary)] px-5 py-4 text-base font-black text-white shadow-lg transition hover:bg-[var(--primary-dark)] disabled:cursor-not-allowed disabled:opacity-70"
           >
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <CheckCircle2 className="h-5 w-5" />}
             Salvar e configurar
