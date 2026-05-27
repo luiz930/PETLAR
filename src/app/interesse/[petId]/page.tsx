@@ -135,7 +135,7 @@ export default function AdoptionInterestPage() {
       <div className="mb-6 flex gap-3 rounded-lg border border-[#f6d58c] bg-[#fef0d6] p-4 text-[#704214]">
         <ShieldCheck aria-hidden className="shrink-0" size={24} />
         <p className="text-sm font-bold leading-6">
-          Não pedimos CPF nem endereço completo no MVP. A avaliação final deve
+          Não pedimos CPF nem endereço completo no PetLar. A avaliação final deve
           ser conduzida pela ONG/protetor com responsabilidade e, quando adequado,
           de forma presencial.
         </p>

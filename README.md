@@ -4,7 +4,7 @@ Conectando animais resgatados a novos lares com responsabilidade.
 
 ## Descricao
 
-PetLar e uma plataforma web de apoio a adocao responsavel de animais. O MVP conecta ONGs, protetores independentes, lares temporarios e adotantes por meio de listagem de pets, formularios de interesse, paineis de acompanhamento e conteudo educativo.
+PetLar e uma plataforma web de apoio a adocao responsavel de animais. A plataforma conecta ONGs, protetores independentes, lares temporarios e adotantes por meio de listagem de pets, formularios de interesse, paineis de acompanhamento e conteudo educativo.
 
 O projeto foi criado para uso como Projeto de Extensao em Ciencia da Computacao, com foco em tecnologia aplicada a um problema social real.
 
@@ -126,7 +126,7 @@ O arquivo `supabase/schema.sql` cria as tabelas, triggers, buckets `pet-images` 
 - Adotantes visualizam apenas seus proprios pedidos.
 - ONGs/protetores editam apenas seus proprios pets.
 - ONGs/protetores visualizam apenas formularios enviados para seus pets.
-- Nao ha CPF nem endereco completo no MVP.
+- Nao ha CPF nem endereco completo no PetLar.
 - Dados sao usados apenas para analise inicial e contato.
 - Conta e dados do usuario podem ser removidos pela pagina de configuracoes.
 

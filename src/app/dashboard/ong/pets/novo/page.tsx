@@ -193,7 +193,7 @@ async function ensureOrganization(
       user_id: userId,
       name: profileName || "ONG/Protetor PetLar",
       type: "protetor_independente",
-      description: "Perfil criado automaticamente pelo cadastro de pets do MVP.",
+      description: "Perfil criado automaticamente pelo cadastro de pets do PetLar.",
       city: "Não informada",
       state: "BR",
       whatsapp: "",

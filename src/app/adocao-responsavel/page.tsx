@@ -56,7 +56,7 @@ export default function ResponsibleAdoptionPage() {
       <section className="mt-8 flex gap-3 rounded-lg border border-[#f6d58c] bg-[#fef0d6] p-5 text-[#704214]">
         <AlertTriangle aria-hidden className="shrink-0" size={26} />
         <p className="font-bold leading-7">
-          Não compre animais pela plataforma. O MVP é voltado exclusivamente para
+          Não compre animais pela plataforma. O PetLar é voltado exclusivamente para
           adoção responsável, lar temporário e apoio a resgates.
         </p>
       </section>

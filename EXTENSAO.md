@@ -28,13 +28,13 @@ A adoção responsável depende de informação clara, triagem e acompanhamento.
 1. Levantamento do problema social com base na rotina de ONGs e protetores.
 2. Definição dos perfis de usuário e fluxos principais.
 3. Prototipação da interface responsiva.
-4. Implementação do MVP em Next.js, TypeScript, Tailwind CSS e Supabase.
+4. Implementação do PetLar em Next.js, TypeScript, Tailwind CSS e Supabase.
 5. Criação de políticas de segurança e privacidade.
 6. Validação local com dados fictícios.
 7. Preparação de material de apresentação e guia para ONGs.
 
 ## Produto final
-MVP web funcional chamado PetLar, com páginas públicas, listagem e detalhes de pets, autenticação preparada, painéis de adotante e ONG/protetor, formulários de adoção e lar temporário, documentação e scripts SQL.
+Plataforma web funcional chamada PetLar, com páginas públicas, listagem e detalhes de pets, autenticação preparada, painéis de adotante e ONG/protetor, formulários de adoção e lar temporário, documentação e scripts SQL.
 
 ## Impacto social esperado
 - Aumentar visibilidade de animais resgatados.

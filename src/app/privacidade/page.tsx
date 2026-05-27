@@ -1,7 +1,7 @@
 const sections = [
   {
     title: "Quais dados são coletados",
-    text: "Nome, e-mail, WhatsApp, cidade, bairro e respostas necessárias para triagem inicial de adoção ou lar temporário. O MVP não solicita CPF nem endereço completo.",
+    text: "Nome, e-mail, WhatsApp, cidade, bairro e respostas necessárias para triagem inicial de adoção ou lar temporário. O PetLar não solicita CPF nem endereço completo.",
   },
   {
     title: "Para que são usados",
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
         <p className="text-sm font-black uppercase text-[#0f766e]">LGPD</p>
         <h1 className="mt-2 text-4xl font-black text-[#18392f]">Privacidade em linguagem simples</h1>
         <p className="mt-4 max-w-4xl leading-7 text-[#52665a]">
-          Esta página explica como o PetLar trata os dados no MVP. Em uma implantação
+          Esta página explica como o PetLar trata os dados na plataforma. Em uma implantação
           real, a instituição responsável deve informar canais de contato e políticas
           complementares.
         </p>
