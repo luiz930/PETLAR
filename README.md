@@ -61,13 +61,15 @@ Acesse `http://localhost:3000`.
 ## Como configurar Supabase
 
 1. Crie um projeto no Supabase.
-2. Em `Project Settings > API`, copie `Project URL` e `anon public key`.
-3. Em `Connect`, escolha `Session Pooler` e copie a connection string.
-4. Copie `.env.example` para `.env.local` e preencha as variaveis.
-5. Reinicie o servidor Next.js.
-6. Execute `npm.cmd run supabase:schema` para criar tabelas, triggers, buckets e politicas RLS.
-7. Ative os provedores desejados em Authentication.
-8. Teste cadastro, login, upload de imagens e permissoes.
+2. Acesse `/configurar-supabase` no PetLar.
+3. Cole a connection string do `Session Pooler`.
+4. Cole a `Project URL`, a `anon public key` e a URL do site.
+5. Em producao na Vercel, informe um token da Vercel e o nome ou ID do projeto.
+6. Marque a opcao para criar tabelas, buckets e politicas RLS.
+7. Salve a configuracao.
+8. Na Vercel, faca `Redeploy` para o site carregar as novas variaveis.
+
+Em ambiente local, a pagina grava `.env.local`. Em producao, ela grava as variaveis no projeto da Vercel usando o token informado na tela. O token nao e salvo no banco.
 
 ## Variaveis de ambiente
 
@@ -77,6 +79,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anon-publica
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 DATABASE_URL=postgresql://postgres.PROJECT_REF:SUA-SENHA@aws-0-region.pooler.supabase.com:5432/postgres
 SUPABASE_DB_POOLER_URL=postgresql://postgres.PROJECT_REF:SUA-SENHA@aws-0-region.pooler.supabase.com:5432/postgres
+PETLAR_SETUP_PASSWORD=senha-opcional-para-proteger-a-pagina
 ```
 
 ## Estrutura de pastas
