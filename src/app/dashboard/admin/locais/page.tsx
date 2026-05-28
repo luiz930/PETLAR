@@ -8,7 +8,6 @@ import {
   getCategoryLabel,
   locationStatusLabels,
   mapSupabaseLocation,
-  mockPetServiceLocations,
   petServiceLocationAdminSelectQuery,
   petServiceCategories,
   rescuedAnimalsLabels,
@@ -34,20 +33,9 @@ export default function AdminLocationsPage() {
       const supabase = getSupabaseBrowserClient();
 
       if (!supabase) {
-        setLocations([
-          {
-            ...mockPetServiceLocations[0],
-            id: "55555555-5555-4555-8555-555555555555",
-            name: "Clínica sugerida para revisão",
-            status: "pendente",
-            suggestedByName: "Usuário de exemplo",
-            suggestedByEmail: "usuario@example.com",
-            sourceInfo: "Indicação recebida pelo formulário",
-          },
-          ...mockPetServiceLocations,
-        ]);
+        setLocations([]);
         setCanAdmin(true);
-        setMessage("Supabase não configurado. Exibindo dados mock para preparar o painel administrativo.");
+        setMessage("Supabase não configurado. O painel está pronto, mas ainda não há locais cadastrados.");
         setLoading(false);
         return;
       }
