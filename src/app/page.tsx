@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { AlertTriangle, ClipboardCheck, HeartHandshake, Home, Search } from "lucide-react";
+import { AlertTriangle, ClipboardCheck, HeartHandshake, Home, MapPin, Phone, Search } from "lucide-react";
 
 const steps = [
   "ONG/protetor cadastra o pet",
@@ -53,7 +53,42 @@ export default function HomePage() {
                 <Home aria-hidden size={18} />
                 Quero ser lar temporario
               </Link>
+              <Link href="/mapa-pet" className="btn-secondary border-white/40 bg-white/95">
+                <MapPin aria-hidden size={18} />
+                Hospitais e apoio
+              </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#e4f5ef] py-12">
+        <div className="container-page grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+          <div>
+            <p className="text-sm font-black uppercase text-[#0f766e]">Hospitais, emergencia e apoio animal</p>
+            <h2 className="mt-2 text-3xl font-black text-[#18392f] md:text-4xl">
+              Precisa de atendimento veterinario ou ponto de apoio?
+            </h2>
+            <p className="mt-3 max-w-2xl leading-7 text-[#52665a]">
+              Acesse o Mapa Pet para encontrar hospitais veterinarios, clinicas, atendimento 24h,
+              castracao popular, ONGs, lares temporarios e pontos de arrecadacao.
+            </p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+              <Link href="/mapa-pet" className="btn-primary">
+                <MapPin aria-hidden size={18} />
+                Abrir Mapa Pet
+              </Link>
+              <Link href="/mapa-pet" className="btn-secondary">
+                <Phone aria-hidden size={18} />
+                Ver contatos de emergencia
+              </Link>
+            </div>
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-3">
+            <HomeHighlight title="Hospitais" text="Hospitais veterinarios, clinicas e plantao 24h." />
+            <HomeHighlight title="Castração" text="Servicos gratuitos, populares ou particulares." />
+            <HomeHighlight title="Apoio" text="ONGs, protetores, lares temporarios e arrecadacao." />
           </div>
         </div>
       </section>
@@ -92,6 +127,15 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+    </div>
+  );
+}
+
+function HomeHighlight({ title, text }: { title: string; text: string }) {
+  return (
+    <div className="surface h-full p-4">
+      <h3 className="text-xl font-black text-[#18392f]">{title}</h3>
+      <p className="mt-2 leading-6 text-[#52665a]">{text}</p>
     </div>
   );
 }

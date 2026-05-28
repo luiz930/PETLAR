@@ -21,11 +21,14 @@ export function Footer() {
           <Link href="/pets" className="text-[#52665a] hover:text-[#0f766e]">
             Pets disponíveis
           </Link>
+          <Link href="/mapa-pet" className="text-[#52665a] hover:text-[#0f766e]">
+            Mapa Pet: hospitais e apoio
+          </Link>
           <Link href="/para-ongs" className="text-[#52665a] hover:text-[#0f766e]">
             Para ONGs
           </Link>
           <Link href="/privacidade" className="text-[#52665a] hover:text-[#0f766e]">
-            Privacidade
+            LGPD e privacidade
           </Link>
         </div>
       </div>

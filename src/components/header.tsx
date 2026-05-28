@@ -8,9 +8,11 @@ import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/pets", label: "Pets" },
+  { href: "/mapa-pet", label: "Mapa Pet" },
   { href: "/adocao-responsavel", label: "Adoção responsável" },
   { href: "/para-ongs", label: "Para ONGs" },
   { href: "/lar-temporario", label: "Lar temporário" },
+  { href: "/privacidade", label: "LGPD" },
 ];
 
 export function Header() {

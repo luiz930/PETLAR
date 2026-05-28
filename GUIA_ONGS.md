@@ -37,3 +37,14 @@ No painel da ONG, altere o status do pet para `Adotado` quando a adoção for co
 
 ## 11. Cuidados com dados pessoais dos adotantes
 Colete apenas o necessário. Não peça CPF ou endereço completo na primeira etapa. Não divulgue dados de interessados em grupos públicos. Use os dados apenas para análise de adoção e contato.
+
+## 12. Como usar o Mapa Pet
+O Mapa Pet fica em `/mapa-pet` e reune locais de atendimento, apoio e servicos para animais. Ele ajuda ONGs, protetores, adotantes e pessoas que encontram animais em situacao de rua a localizar suporte com mais rapidez.
+
+1. Encontrar atendimento veterinario: busque por nome, bairro ou cidade e filtre por hospital veterinario, clinica ou outro tipo de servico.
+2. Consultar emergencia: use os filtros `Atendimento 24h` e `Emergencia` para localizar locais que informam esse tipo de suporte, sempre confirmando antes de se deslocar.
+3. Indicar locais confiaveis: usuarios autenticados podem sugerir um local em `/dashboard/locais/novo`; a sugestao fica pendente ate revisao.
+4. Sugerir pontos de arrecadacao: cadastre enderecos que recebem racao, cobertas, medicamentos dentro da validade e itens de higiene.
+5. Apoiar adotantes com informacoes uteis: compartilhe o link do local ou oriente o adotante a abrir a rota no Google Maps, ligar ou chamar no WhatsApp quando o contato estiver disponivel.
+
+Sempre confirme telefone, horario, valores e disponibilidade diretamente com o local. O Mapa Pet e um apoio informativo e nao substitui avaliacao profissional, triagem da ONG ou atendimento veterinario presencial.

@@ -26,6 +26,10 @@ Ajudar organizacoes e protetores a divulgarem caes e gatos resgatados, organizar
 - Edicao de pets em `/dashboard/ong/pets/[id]/editar`.
 - Interessados recebidos em `/dashboard/ong/interessados`.
 - Cadastro de lar temporario em `/lar-temporario`.
+- Mapa Pet em `/mapa-pet`, com busca, filtros e cards de hospitais veterinarios, clinicas, emergencias, castracao popular, ONGs, lares temporarios e pontos de apoio.
+- Detalhes de local em `/mapa-pet/[id]`, com endereco, contatos, horario, rota no Google Maps e aviso de confirmacao.
+- Sugestao autenticada de locais em `/dashboard/locais/novo`, sempre entrando como `pendente`.
+- Revisao administrativa de locais em `/dashboard/admin/locais`, preparada para aprovar, editar, inativar ou excluir cadastros.
 - Conteudo educativo em `/adocao-responsavel`.
 - Pagina para ONGs em `/para-ongs`.
 - Politica simples de privacidade em `/privacidade`.
@@ -92,6 +96,7 @@ src/
     cadastro/
     dashboard/
     interesse/
+    mapa-pet/
     lar-temporario/
     adocao-responsavel/
     para-ongs/
@@ -116,23 +121,46 @@ As tabelas principais sao:
 - `pet_images`: URLs das imagens de cada pet.
 - `adoption_applications`: formularios de interesse em adocao.
 - `temporary_homes`: voluntarios para lar temporario.
+- `pet_service_locations`: locais uteis para a causa animal, como hospitais veterinarios, clinicas, emergencia 24h, castracao popular, ONGs, protetores, lares temporarios, pet shops, banho e tosa, pontos de arrecadacao e servicos publicos.
 
 O arquivo `supabase/schema.sql` cria as tabelas, triggers, buckets `pet-images` e `profile-avatars` e politicas RLS.
+
+### Tabela `pet_service_locations`
+
+Campos principais:
+
+- `id`, `name`, `category`, `description`, `address`, `neighborhood`, `city`, `state`, `zip_code`.
+- Contatos: `phone`, `whatsapp`, `email`, `website`, `instagram`.
+- Atendimento: `opening_hours`, `is_24h`, `has_emergency`, `helps_rescued_animals`, `service_type`.
+- Revisao: `status` (`ativo`, `pendente`, `inativo`), `suggested_by`, `source_info`, `created_at`, `updated_at`.
+- Mapa: `latitude` e `longitude`, opcionais para futura integracao com Leaflet ou outra biblioteca gratuita.
+
+Locais sugeridos por usuarios autenticados entram como `pendente`. Apenas locais `ativo` aparecem publicamente. O botao `Abrir no Google Maps` usa:
+
+```text
+https://www.google.com/maps/search/?api=1&query=ENDERECO_COMPLETO
+```
+
+Para cadastrar locais iniciais, execute `supabase/seed.sql` depois do schema ou use o mock local ja incluido em `src/lib/pet-service-locations.ts`.
 
 ## Regras de seguranca e privacidade
 
 - Visitantes leem apenas pets disponiveis e dados publicos das organizacoes.
+- Visitantes leem apenas locais ativos no Mapa Pet.
 - Usuarios autenticados criam formularios de adocao.
+- Usuarios autenticados podem sugerir locais, mas eles ficam pendentes ate revisao.
 - Adotantes visualizam apenas seus proprios pedidos.
 - ONGs/protetores editam apenas seus proprios pets.
 - ONGs/protetores visualizam apenas formularios enviados para seus pets.
+- Administradores podem revisar, aprovar, editar, inativar e excluir locais do Mapa Pet.
 - Nao ha CPF nem endereco completo no PetLar.
 - Dados sao usados apenas para analise inicial e contato.
 - Conta e dados do usuario podem ser removidos pela pagina de configuracoes.
 
 ## Proximos passos
 
-- Criar painel admin para aprovacao e moderacao.
+- Evoluir painel admin com auditoria completa de moderacao.
+- Integrar mapa interativo com Leaflet usando `latitude` e `longitude`.
 - Adicionar testes automatizados de rotas e formularios.
 - Adicionar notificacoes por e-mail para novas solicitacoes.
 - Preparar deploy em producao com variaveis de ambiente protegidas.

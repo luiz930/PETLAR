@@ -61,3 +61,9 @@ Plataforma web funcional chamada PetLar, com páginas públicas, listagem e deta
 - Mostrar o painel de interessados recebidos.
 - Reforçar que a plataforma não substitui entrevista, visita ou avaliação presencial.
 - Explicar cuidados com dados pessoais e LGPD.
+- Mostrar o Mapa Pet como apoio para encontrar hospitais veterinarios, clinicas, emergencias, castracao popular e pontos de arrecadacao.
+
+## Modulo Mapa Pet
+O PetLar tambem mapeia servicos uteis para a comunidade, como hospitais veterinarios, clinicas, atendimentos de emergencia, servicos de castracao, ONGs, protetores independentes, lares temporarios, pet shops, banho e tosa, pontos de arrecadacao e servicos publicos relacionados a causa animal.
+
+Esse modulo amplia o impacto social do projeto porque apoia adotantes, ONGs, protetores e pessoas que encontram animais em situacao de rua. As informacoes devem ser revisadas antes de serem publicadas e confirmadas diretamente com o local antes de qualquer deslocamento.

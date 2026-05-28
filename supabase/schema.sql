@@ -105,6 +105,51 @@ create table if not exists public.temporary_homes (
   created_at timestamptz not null default now()
 );
 
+create table if not exists public.pet_service_locations (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  category text not null check (
+    category in (
+      'hospital_veterinario',
+      'clinica_veterinaria',
+      'emergencia_24h',
+      'castracao_popular',
+      'ong_protecao',
+      'protetor_independente',
+      'lar_temporario',
+      'pet_shop',
+      'banho_tosa',
+      'ponto_arrecadacao',
+      'servico_publico',
+      'outro'
+    )
+  ),
+  description text,
+  address text not null,
+  neighborhood text,
+  city text not null,
+  state text not null,
+  zip_code text,
+  phone text,
+  whatsapp text,
+  email text,
+  website text,
+  instagram text,
+  opening_hours text,
+  is_24h boolean not null default false,
+  has_emergency boolean not null default false,
+  helps_rescued_animals text not null default 'nao_informado' check (helps_rescued_animals in ('sim', 'nao', 'nao_informado')),
+  service_type text not null default 'nao_informado' check (service_type in ('gratuito', 'popular', 'particular', 'nao_informado')),
+  notes text,
+  latitude numeric,
+  longitude numeric,
+  status text not null default 'pendente' check (status in ('ativo', 'pendente', 'inativo')),
+  suggested_by uuid references public.profiles(id) on delete set null,
+  source_info text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -118,6 +163,11 @@ $$;
 drop trigger if exists pets_set_updated_at on public.pets;
 create trigger pets_set_updated_at
 before update on public.pets
+for each row execute function public.set_updated_at();
+
+drop trigger if exists pet_service_locations_set_updated_at on public.pet_service_locations;
+create trigger pet_service_locations_set_updated_at
+before update on public.pet_service_locations
 for each row execute function public.set_updated_at();
 
 create or replace function public.handle_new_user()
@@ -138,6 +188,20 @@ begin
 end;
 $$;
 
+create or replace function public.is_admin()
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1
+    from public.profiles
+    where id = auth.uid() and role = 'admin'
+  );
+$$;
+
 drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
 after insert on auth.users
@@ -149,8 +213,10 @@ alter table public.pets enable row level security;
 alter table public.pet_images enable row level security;
 alter table public.adoption_applications enable row level security;
 alter table public.temporary_homes enable row level security;
+alter table public.pet_service_locations enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
+drop policy if exists "profiles_admin_select" on public.profiles;
 drop policy if exists "profiles_insert_own" on public.profiles;
 drop policy if exists "profiles_update_own" on public.profiles;
 drop policy if exists "organizations_public_approved" on public.organizations;
@@ -170,9 +236,17 @@ drop policy if exists "applications_org_update_status" on public.adoption_applic
 drop policy if exists "temporary_homes_insert_own" on public.temporary_homes;
 drop policy if exists "temporary_homes_select_own" on public.temporary_homes;
 drop policy if exists "temporary_homes_select_orgs" on public.temporary_homes;
+drop policy if exists "pet_service_locations_public_active" on public.pet_service_locations;
+drop policy if exists "pet_service_locations_suggest_authenticated" on public.pet_service_locations;
+drop policy if exists "pet_service_locations_admin_select" on public.pet_service_locations;
+drop policy if exists "pet_service_locations_admin_update" on public.pet_service_locations;
+drop policy if exists "pet_service_locations_admin_delete" on public.pet_service_locations;
 
 create policy "profiles_select_own" on public.profiles
 for select using (auth.uid() = id);
+
+create policy "profiles_admin_select" on public.profiles
+for select using (public.is_admin());
 
 create policy "profiles_insert_own" on public.profiles
 for insert with check (auth.uid() = id);
@@ -296,6 +370,22 @@ for select using (
     where p.id = auth.uid() and p.role in ('ong', 'admin')
   )
 );
+
+create policy "pet_service_locations_public_active" on public.pet_service_locations
+for select using (status = 'ativo');
+
+create policy "pet_service_locations_suggest_authenticated" on public.pet_service_locations
+for insert to authenticated
+with check (suggested_by = auth.uid() and status = 'pendente');
+
+create policy "pet_service_locations_admin_select" on public.pet_service_locations
+for select using (public.is_admin());
+
+create policy "pet_service_locations_admin_update" on public.pet_service_locations
+for update using (public.is_admin()) with check (public.is_admin());
+
+create policy "pet_service_locations_admin_delete" on public.pet_service_locations
+for delete using (public.is_admin());
 
 insert into storage.buckets (id, name, public)
 values ('pet-images', 'pet-images', true)
