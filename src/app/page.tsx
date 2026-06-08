@@ -5,9 +5,9 @@ import { AlertTriangle, ClipboardCheck, HeartHandshake, Home, MapPin, Phone, Sea
 const steps = [
   "ONG/protetor cadastra o pet",
   "Adotante encontra um animal",
-  "Adotante preenche o formulario",
+  "Adotante preenche o formulário",
   "ONG/protetor avalia o pedido",
-  "Adocao segue presencialmente com responsabilidade",
+  "Adoção segue presencialmente com responsabilidade",
 ];
 
 export default function HomePage() {
@@ -36,8 +36,8 @@ export default function HomePage() {
               Conectando animais resgatados a novos lares com responsabilidade.
             </p>
             <p className="mt-5 max-w-2xl text-base leading-7 text-[#f4ead8]">
-              Uma plataforma para ONGs, protetores independentes, lares temporarios
-              e adotantes organizarem a divulgacao de caes e gatos resgatados,
+              Uma plataforma para ONGs, protetores independentes, lares temporários
+              e adotantes organizarem a divulgação de cães e gatos resgatados,
               triagem inicial e contato seguro.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -51,7 +51,7 @@ export default function HomePage() {
               </Link>
               <Link href="/lar-temporario" className="btn-secondary border-white/40 bg-white/95">
                 <Home aria-hidden size={18} />
-                Quero ser lar temporario
+                Quero ser lar temporário
               </Link>
               <Link href="/mapa-pet" className="btn-secondary border-white/40 bg-white/95">
                 <MapPin aria-hidden size={18} />
@@ -65,13 +65,13 @@ export default function HomePage() {
       <section className="bg-[#e4f5ef] py-12">
         <div className="container-page grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
-            <p className="text-sm font-black uppercase text-[#0f766e]">Hospitais, emergencia e apoio animal</p>
+            <p className="text-sm font-black uppercase text-[#0f766e]">Hospitais, emergência e apoio animal</p>
             <h2 className="mt-2 text-3xl font-black text-[#18392f] md:text-4xl">
-              Precisa de atendimento veterinario ou ponto de apoio?
+              Precisa de atendimento veterinário ou ponto de apoio?
             </h2>
             <p className="mt-3 max-w-2xl leading-7 text-[#52665a]">
-              Acesse o Mapa Pet para encontrar hospitais veterinarios, clinicas, atendimento 24h,
-              castracao popular, ONGs, lares temporarios e pontos de arrecadacao.
+              Acesse o Mapa Pet para encontrar hospitais veterinários, clínicas, atendimento 24h,
+              castração popular, ONGs, lares temporários e pontos de arrecadação.
             </p>
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <Link href="/mapa-pet" className="btn-primary">
@@ -80,15 +80,15 @@ export default function HomePage() {
               </Link>
               <Link href="/mapa-pet" className="btn-secondary">
                 <Phone aria-hidden size={18} />
-                Ver contatos de emergencia
+                Ver contatos de emergência
               </Link>
             </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-3">
-            <HomeHighlight title="Hospitais" text="Hospitais veterinarios, clinicas e plantao 24h." />
-            <HomeHighlight title="Castração" text="Servicos gratuitos, populares ou particulares." />
-            <HomeHighlight title="Apoio" text="ONGs, protetores, lares temporarios e arrecadacao." />
+            <HomeHighlight title="Hospitais" text="Hospitais veterinários, clínicas e plantão 24h." />
+            <HomeHighlight title="Castração" text="Serviços gratuitos, populares ou particulares." />
+            <HomeHighlight title="Apoio" text="ONGs, protetores, lares temporários e arrecadação." />
           </div>
         </div>
       </section>

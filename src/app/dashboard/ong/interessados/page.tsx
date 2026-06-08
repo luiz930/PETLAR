@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { Mail, MessageCircle, UserCheck } from "lucide-react";
 import { applicationStatusLabels, type ApplicationStatus } from "@/data/domain";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getWhatsappUrl } from "@/lib/pet-service-locations";
 
 type InterestedItem = {
   id: string;
@@ -17,6 +18,16 @@ type InterestedItem = {
   sentAt: string;
   status: ApplicationStatus;
   reason: string;
+  housingType: string;
+  housingStatus: string;
+  householdAgrees: boolean;
+  hasOtherPets: boolean;
+  currentPetsCare: string;
+  hadPetBefore: boolean;
+  petAccessToStreet: string;
+  hoursAlonePerDay: string;
+  canAffordVet: boolean;
+  longTermResponsibility: boolean;
 };
 
 export default function InterestedPeoplePage() {
@@ -34,7 +45,7 @@ export default function InterestedPeoplePage() {
 
       const { data } = await supabase
         .from("adoption_applications")
-        .select("id, full_name, email, whatsapp, city, neighborhood, created_at, status, reason_to_adopt, pets(name)")
+        .select("id, full_name, email, whatsapp, city, neighborhood, created_at, status, reason_to_adopt, housing_type, housing_status, household_agrees, has_other_pets, current_pets_castrated_vaccinated, had_pet_before, pet_access_to_street, hours_alone_per_day, can_afford_vet, long_term_responsibility, pets(name)")
         .order("created_at", { ascending: false });
 
       if (data) {
@@ -49,6 +60,16 @@ export default function InterestedPeoplePage() {
           sentAt: String(item.created_at),
           status: item.status as ApplicationStatus,
           reason: String(item.reason_to_adopt ?? ""),
+          housingType: String(item.housing_type ?? ""),
+          housingStatus: String(item.housing_status ?? ""),
+          householdAgrees: Boolean(item.household_agrees),
+          hasOtherPets: Boolean(item.has_other_pets),
+          currentPetsCare: String(item.current_pets_castrated_vaccinated ?? "Não informado"),
+          hadPetBefore: Boolean(item.had_pet_before),
+          petAccessToStreet: String(item.pet_access_to_street ?? ""),
+          hoursAlonePerDay: String(item.hours_alone_per_day ?? ""),
+          canAffordVet: Boolean(item.can_afford_vet),
+          longTermResponsibility: Boolean(item.long_term_responsibility),
         }));
         setItems(mapped);
         setSelected(mapped[0]?.id ?? null);
@@ -92,10 +113,12 @@ export default function InterestedPeoplePage() {
                       <UserCheck aria-hidden size={16} />
                       Ver formulário completo
                     </button>
-                    <a className="btn-secondary px-3 py-2 text-sm" href={`https://wa.me/${item.whatsapp}`} target="_blank" rel="noreferrer">
-                      <MessageCircle aria-hidden size={16} />
-                      WhatsApp
-                    </a>
+                    {getWhatsappUrl(item.whatsapp) && (
+                      <a className="btn-secondary px-3 py-2 text-sm" href={getWhatsappUrl(item.whatsapp)} target="_blank" rel="noreferrer">
+                        <MessageCircle aria-hidden size={16} />
+                        WhatsApp
+                      </a>
+                    )}
                     <a className="btn-secondary px-3 py-2 text-sm" href={`mailto:${item.email}`}>
                       <Mail aria-hidden size={16} />
                       E-mail
@@ -119,6 +142,15 @@ export default function InterestedPeoplePage() {
                 <Detail label="E-mail" value={current.email} />
                 <Detail label="WhatsApp" value={current.whatsapp} />
                 <Detail label="Cidade/Bairro" value={`${current.city} · ${current.neighborhood}`} />
+                <Detail label="Moradia" value={`${current.housingType} · ${current.housingStatus}`} />
+                <Detail label="Todos da casa concordam" value={formatBoolean(current.householdAgrees)} />
+                <Detail label="Possui outros animais" value={formatBoolean(current.hasOtherPets)} />
+                <Detail label="Cuidados dos animais atuais" value={current.currentPetsCare} />
+                <Detail label="Já teve pet antes" value={formatBoolean(current.hadPetBefore)} />
+                <Detail label="Acesso à rua" value={current.petAccessToStreet} />
+                <Detail label="Tempo sozinho por dia" value={current.hoursAlonePerDay} />
+                <Detail label="Consegue custear veterinário" value={formatBoolean(current.canAffordVet)} />
+                <Detail label="Responsabilidade de longo prazo" value={formatBoolean(current.longTermResponsibility)} />
                 <Detail label="Motivação" value={current.reason} />
                 <Detail label="Status" value={applicationStatusLabels[current.status]} />
               </dl>
@@ -143,6 +175,10 @@ function getRelatedName(value: unknown) {
     return String((value as { name?: string }).name ?? "Pet");
   }
   return "Pet";
+}
+
+function formatBoolean(value: boolean) {
+  return value ? "Sim" : "Não";
 }
 
 function Detail({ label, value }: { label: string; value: string }) {

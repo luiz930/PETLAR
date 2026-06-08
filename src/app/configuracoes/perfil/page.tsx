@@ -104,17 +104,14 @@ export default function ProfileSettingsPage() {
     }
 
     const nextProfile = {
-      id: userId,
       name: String(form.get("name")),
-      email: profile.email,
-      role: profile.role,
       phone: String(form.get("phone")),
       city: String(form.get("city")),
       state: String(form.get("state")).toUpperCase(),
       avatar_url: avatarUrl || null,
     };
 
-    const { error } = await supabase.from("profiles").upsert(nextProfile);
+    const { error } = await supabase.from("profiles").update(nextProfile).eq("id", userId);
     setSaving(false);
 
     if (error) {

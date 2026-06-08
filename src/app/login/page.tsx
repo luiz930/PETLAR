@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState } from "react";
 import { LogIn } from "lucide-react";
-import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   return (
@@ -34,7 +34,7 @@ function LoginContent() {
       return;
     }
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
 
     if (error) {
@@ -45,7 +45,7 @@ function LoginContent() {
     const { data: profile } = await supabase
       .from("profiles")
       .select("role")
-      .limit(1)
+      .eq("id", data.user.id)
       .maybeSingle();
 
     router.push(profile?.role === "ong" ? "/dashboard/ong" : "/dashboard/adotante");
@@ -60,7 +60,6 @@ function LoginContent() {
           Visitantes podem navegar livremente. O login é necessário para enviar
           interesse de adoção e acompanhar pedidos.
         </p>
-        {!isSupabaseConfigured && null}
         {searchParams.get("cadastro") === "ok" && (
           <div className="mt-4 rounded-lg bg-[#e4f5ef] p-3 text-sm font-bold text-[#0f5f57]">
             Cadastro criado. Entre com seu e-mail e senha.

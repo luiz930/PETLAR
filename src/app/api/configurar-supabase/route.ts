@@ -10,9 +10,6 @@ type SetupPayload = {
   setupPassword?: string;
 };
 
-const DEFAULT_SUPABASE_ANON_KEY =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxaHV1Y2F0cHpjc3VtamphbGRsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk5MDUwMDUsImV4cCI6MjA5NTQ4MTAwNX0.E9BrK3AsfDBZ_pGvj3plobKcEHPPu0G296tDuTOHxUw";
-
 const ENV_KEYS = [
   "NEXT_PUBLIC_SUPABASE_URL",
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
@@ -49,7 +46,7 @@ function normalizeDatabaseUrl(databaseUrl: string) {
 function validatePayload(payload: SetupPayload, request: Request) {
   const databaseUrl = normalizeDatabaseUrl(clean(payload.databaseUrl));
   const supabaseUrl = inferSupabaseUrl(databaseUrl);
-  const supabaseAnonKey = clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) || DEFAULT_SUPABASE_ANON_KEY;
+  const supabaseAnonKey = clean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
   const requestOrigin = request.headers.get("origin") || new URL(request.url).origin;
   const appUrl = clean(process.env.NEXT_PUBLIC_APP_URL) || requestOrigin;
 
@@ -77,8 +74,33 @@ function validatePayload(payload: SetupPayload, request: Request) {
 }
 
 async function writeLocalEnv(vars: Record<(typeof ENV_KEYS)[number], string>) {
-  const content = ENV_KEYS.map((key) => `${key}=${vars[key]}`).join("\n") + "\n";
-  await fs.writeFile(path.join(process.cwd(), ".env.local"), content, "utf8");
+  const envPath = path.join(process.cwd(), ".env.local");
+  let current = "";
+
+  try {
+    current = await fs.readFile(envPath, "utf8");
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+  }
+
+  const pending = new Map(ENV_KEYS.map((key) => [key, vars[key]]));
+  const lines = current.replace(/\r\n/g, "\n").split("\n");
+  if (lines.at(-1) === "") lines.pop();
+
+  const updatedLines = lines.map((line) => {
+    const key = line.match(/^([A-Z0-9_]+)=/)?.[1] as (typeof ENV_KEYS)[number] | undefined;
+    if (!key || !pending.has(key)) return line;
+
+    const value = pending.get(key);
+    pending.delete(key);
+    return `${key}=${value}`;
+  });
+
+  for (const [key, value] of pending) {
+    updatedLines.push(`${key}=${value}`);
+  }
+
+  await fs.writeFile(envPath, `${updatedLines.join("\n")}\n`, "utf8");
 }
 
 async function saveVercelEnv(vars: Record<(typeof ENV_KEYS)[number], string>) {
@@ -144,9 +166,16 @@ async function applySupabaseSchema(databaseUrl: string) {
 export async function POST(request: Request) {
   try {
     const payload = (await request.json()) as SetupPayload;
-    const expectedPassword = process.env.PETLAR_SETUP_PASSWORD;
+    const expectedPassword = clean(process.env.PETLAR_SETUP_PASSWORD);
 
-    if (expectedPassword && payload.setupPassword !== expectedPassword) {
+    if (!expectedPassword) {
+      return NextResponse.json(
+        { error: "Configure PETLAR_SETUP_PASSWORD no servidor antes de usar esta rota." },
+        { status: 503 },
+      );
+    }
+
+    if (payload.setupPassword !== expectedPassword) {
       return NextResponse.json({ error: "Senha de configuracao invalida." }, { status: 401 });
     }
 

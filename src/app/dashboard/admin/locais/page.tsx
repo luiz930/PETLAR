@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { CheckCircle2, Power, Save, Trash2 } from "lucide-react";
+import { Building2, CheckCircle2, Power, Save, Trash2 } from "lucide-react";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
   getCategoryLabel,
@@ -34,8 +34,7 @@ export default function AdminLocationsPage() {
 
       if (!supabase) {
         setLocations([]);
-        setCanAdmin(true);
-        setMessage("Supabase não configurado. O painel está pronto, mas ainda não há locais cadastrados.");
+        setMessage("Supabase não configurado. Não é possível abrir a revisão administrativa.");
         setLoading(false);
         return;
       }
@@ -82,11 +81,13 @@ export default function AdminLocationsPage() {
   }, [locations, statusFilter]);
 
   async function updateStatus(id: string, status: PetServiceStatus) {
-    setLocations((current) => current.map((location) => (location.id === id ? { ...location, status } : location)));
     const supabase = getSupabaseBrowserClient();
     if (supabase && canAdmin) {
       const { error } = await supabase.from("pet_service_locations").update({ status }).eq("id", id);
       setMessage(error ? error.message : "Status atualizado.");
+      if (!error) {
+        setLocations((current) => current.map((location) => (location.id === id ? { ...location, status } : location)));
+      }
     }
   }
 
@@ -123,11 +124,13 @@ export default function AdminLocationsPage() {
   }
 
   async function deleteLocation(id: string) {
-    setLocations((current) => current.filter((location) => location.id !== id));
     const supabase = getSupabaseBrowserClient();
     if (supabase && canAdmin) {
       const { error } = await supabase.from("pet_service_locations").delete().eq("id", id);
       setMessage(error ? error.message : "Local excluído.");
+      if (!error) {
+        setLocations((current) => current.filter((location) => location.id !== id));
+      }
     }
   }
 
@@ -145,9 +148,15 @@ export default function AdminLocationsPage() {
             Aprove locais sugeridos, corrija informações, marque como inativo ou exclua cadastros incorretos.
           </p>
         </div>
-        <Link href="/dashboard/locais/novo" className="btn-secondary">
-          Sugerir local
-        </Link>
+        <div className="flex flex-wrap gap-2">
+          <Link href="/dashboard/admin/ongs" className="btn-secondary">
+            <Building2 aria-hidden size={18} />
+            Revisar ONGs
+          </Link>
+          <Link href="/dashboard/locais/novo" className="btn-secondary">
+            Sugerir local
+          </Link>
+        </div>
       </div>
 
       {message && <p className="mb-5 rounded-lg bg-[#e4f5ef] p-4 font-bold text-[#0f5f57]">{message}</p>}
@@ -173,7 +182,7 @@ export default function AdminLocationsPage() {
                   <h2 className="mt-1 text-2xl font-black text-[#18392f]">{location.name}</h2>
                   <p className="mt-1 text-sm font-bold text-[#52665a]">
                     Status: {locationStatusLabels[location.status]} · Sugerido por:{" "}
-                    {location.suggestedByName || location.suggestedByEmail || location.suggestedBy || "Seed/mock"}
+                    {location.suggestedByName || location.suggestedByEmail || location.suggestedBy || "Cadastro direto"}
                   </p>
                   {location.sourceInfo && <p className="mt-1 text-sm font-semibold text-[#52665a]">Fonte: {location.sourceInfo}</p>}
                 </div>

@@ -13,6 +13,7 @@ type SetupResponse = {
 
 export default function ConfigurarSupabasePage() {
   const [databaseUrl, setDatabaseUrl] = useState("");
+  const [setupPassword, setSetupPassword] = useState("");
   const [status, setStatus] = useState<SetupResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +25,7 @@ export default function ConfigurarSupabasePage() {
     const response = await fetch("/api/configurar-supabase", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ databaseUrl }),
+      body: JSON.stringify({ databaseUrl, setupPassword }),
     });
 
     const data = (await response.json()) as SetupResponse;
@@ -44,8 +45,21 @@ export default function ConfigurarSupabasePage() {
           </span>
           <h1 className="mt-3 text-3xl font-black text-[var(--text)]">Configurar banco</h1>
           <p className="mt-2 text-sm font-semibold text-[var(--muted)]">
-            Cole apenas a connection string do Session Pooler.
+            Informe a senha administrativa e cole a connection string do Session Pooler.
           </p>
+
+          <label className="mt-6 block">
+            <span className="mb-2 block text-sm font-black text-[var(--text)]">
+              Senha de configuração
+            </span>
+            <input
+              required
+              type="password"
+              value={setupPassword}
+              onChange={(event) => setSetupPassword(event.target.value)}
+              className="w-full rounded-lg border border-[var(--border)] px-4 py-3 text-sm outline-none focus:border-[var(--primary)]"
+            />
+          </label>
 
           <label className="mt-6 block">
             <span className="mb-2 flex items-center gap-2 text-sm font-black text-[var(--text)]">

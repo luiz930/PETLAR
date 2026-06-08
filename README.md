@@ -30,6 +30,7 @@ Ajudar organizacoes e protetores a divulgarem caes e gatos resgatados, organizar
 - Detalhes de local em `/mapa-pet/[id]`, com endereco, contatos, horario, rota no Google Maps e aviso de confirmacao.
 - Sugestao autenticada de locais em `/dashboard/locais/novo`, sempre entrando como `pendente`.
 - Revisao administrativa de locais em `/dashboard/admin/locais`, preparada para aprovar, editar, inativar ou excluir cadastros.
+- Revisao administrativa de ONGs e protetores em `/dashboard/admin/ongs`, com aprovacao antes da publicacao dos pets.
 - Conteudo educativo em `/adocao-responsavel`.
 - Pagina para ONGs em `/para-ongs`.
 - Politica simples de privacidade em `/privacidade`.
@@ -65,12 +66,13 @@ Acesse `http://localhost:3000`.
 ## Como configurar Supabase
 
 1. Crie um projeto no Supabase.
-2. Acesse `/configurar-supabase` no PetLar.
-3. Cole somente a connection string do `Session Pooler`.
-4. Clique em `Salvar e configurar`.
-5. Na Vercel, faca `Redeploy` para o site carregar as novas variaveis.
+2. Defina `NEXT_PUBLIC_SUPABASE_ANON_KEY` e uma senha forte em `PETLAR_SETUP_PASSWORD`.
+3. Acesse `/configurar-supabase` no PetLar.
+4. Informe a senha administrativa e cole somente a connection string do `Session Pooler`.
+5. Clique em `Salvar e configurar`.
+6. Na Vercel, faca `Redeploy` para o site carregar as novas variaveis.
 
-Em ambiente local, a pagina grava `.env.local`. Em producao, para manter a tela com um campo so, o projeto precisa ter `PETLAR_VERCEL_TOKEN` e `PETLAR_VERCEL_PROJECT_ID` configurados uma vez no painel da Vercel.
+Em ambiente local, a pagina atualiza `.env.local` sem apagar as demais variaveis existentes. Em producao, o projeto precisa ter `PETLAR_VERCEL_TOKEN` e `PETLAR_VERCEL_PROJECT_ID` configurados uma vez no painel da Vercel.
 
 ## Variaveis de ambiente
 
@@ -80,7 +82,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anon-publica
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 DATABASE_URL=postgresql://postgres.PROJECT_REF:SUA-SENHA@aws-0-region.pooler.supabase.com:5432/postgres
 SUPABASE_DB_POOLER_URL=postgresql://postgres.PROJECT_REF:SUA-SENHA@aws-0-region.pooler.supabase.com:5432/postgres
-PETLAR_SETUP_PASSWORD=senha-opcional-para-proteger-a-pagina
+PETLAR_SETUP_PASSWORD=senha-forte-obrigatoria-para-proteger-a-pagina
 PETLAR_VERCEL_TOKEN=token-opcional-para-a-pagina-salvar-na-vercel
 PETLAR_VERCEL_PROJECT_ID=PETLAR
 PETLAR_VERCEL_TEAM_ID=team-opcional
@@ -141,7 +143,7 @@ Locais sugeridos por usuarios autenticados entram como `pendente`. Apenas locais
 https://www.google.com/maps/search/?api=1&query=ENDERECO_COMPLETO
 ```
 
-Para cadastrar locais iniciais, execute `supabase/seed.sql` depois do schema ou use o mock local ja incluido em `src/lib/pet-service-locations.ts`.
+O arquivo `supabase/seed.sql` nao inclui exemplos. Cadastre apenas locais reais pelo painel ou diretamente no Supabase.
 
 ## Regras de seguranca e privacidade
 
@@ -152,14 +154,17 @@ Para cadastrar locais iniciais, execute `supabase/seed.sql` depois do schema ou 
 - Adotantes visualizam apenas seus proprios pedidos.
 - ONGs/protetores editam apenas seus proprios pets.
 - ONGs/protetores visualizam apenas formularios enviados para seus pets.
+- Pets de ONGs/protetores pendentes nao aparecem publicamente ate aprovacao administrativa.
 - Administradores podem revisar, aprovar, editar, inativar e excluir locais do Mapa Pet.
+- Administradores podem aprovar ou suspender ONGs e protetores.
+- Usuarios autenticados alteram apenas arquivos enviados em suas proprias pastas no Storage.
 - Nao ha CPF nem endereco completo no PetLar.
 - Dados sao usados apenas para analise inicial e contato.
 - Conta e dados do usuario podem ser removidos pela pagina de configuracoes.
 
 ## Proximos passos
 
-- Evoluir painel admin com auditoria completa de moderacao.
+- Adicionar trilha de auditoria para a moderacao administrativa.
 - Integrar mapa interativo com Leaflet usando `latitude` e `longitude`.
 - Adicionar testes automatizados de rotas e formularios.
 - Adicionar notificacoes por e-mail para novas solicitacoes.

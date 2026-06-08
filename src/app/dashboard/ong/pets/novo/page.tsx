@@ -36,20 +36,24 @@ export default function NewPetPage() {
       return;
     }
 
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("name, email, role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profile?.role !== "ong") {
+      setMessage("Este cadastro é restrito a contas de ONG ou protetor.");
+      setSaving(false);
+      return;
+    }
+
     const form = new FormData(event.currentTarget);
-    const profileName = String(user.user_metadata?.name ?? "Responsável PetLar");
-    const profileEmail = user.email ?? "";
+    const profileName = String(profile.name ?? user.user_metadata?.name ?? "Responsável PetLar");
+    const profileEmail = String(profile.email ?? user.email ?? "");
+    const organization = await ensureOrganization(supabase, user.id, profileName, profileEmail);
 
-    await supabase.from("profiles").upsert({
-      id: user.id,
-      name: profileName,
-      email: profileEmail,
-      role: "ong",
-    });
-
-    const organizationId = await ensureOrganization(supabase, user.id, profileName, profileEmail);
-
-    if (!organizationId) {
+    if (!organization) {
       setMessage("Não foi possível criar ou localizar a organização do usuário.");
       setSaving(false);
       return;
@@ -58,7 +62,7 @@ export default function NewPetPage() {
     const { data: pet, error: petError } = await supabase
       .from("pets")
       .insert({
-        organization_id: organizationId,
+        organization_id: organization.id,
         name: String(form.get("name")),
         species: String(form.get("species")),
         sex: String(form.get("sex")),
@@ -121,7 +125,11 @@ export default function NewPetPage() {
     }
 
     event.currentTarget.reset();
-    setMessage("Pet salvo no Supabase com imagens registradas.");
+    setMessage(
+      organization.approved
+        ? "Pet salvo com sucesso."
+        : "Pet salvo. Ele ficará visível publicamente após a aprovação da ONG/protetor pela administração.",
+    );
     setSaving(false);
   }
 
@@ -131,8 +139,8 @@ export default function NewPetPage() {
         <p className="text-sm font-black uppercase text-[#0f766e]">Cadastro de pet</p>
         <h1 className="mt-2 text-4xl font-black text-[#18392f]">Cadastrar novo pet</h1>
         <p className="mt-2 max-w-3xl leading-7 text-[#52665a]">
-          Este formulário grava o pet no PostgreSQL do Supabase e envia as fotos
-          para o bucket `pet-images`.
+          Cadastre os dados do animal resgatado e envie fotos claras. A publicação
+          depende da aprovação da ONG ou protetor pela administração.
         </p>
       </div>
       <form className="surface grid gap-5 p-5 md:grid-cols-2" onSubmit={handleSubmit}>
@@ -180,12 +188,14 @@ async function ensureOrganization(
 ) {
   const { data: existing } = await supabase
     .from("organizations")
-    .select("id")
+    .select("id, approved")
     .eq("user_id", userId)
     .limit(1)
     .maybeSingle();
 
-  if (existing?.id) return existing.id as string;
+  if (existing?.id) {
+    return { id: String(existing.id), approved: Boolean(existing.approved) };
+  }
 
   const { data: organization } = await supabase
     .from("organizations")
@@ -198,12 +208,14 @@ async function ensureOrganization(
       state: "BR",
       whatsapp: "",
       email: profileEmail,
-      approved: true,
+      approved: false,
     })
-    .select("id")
+    .select("id, approved")
     .single();
 
-  return organization?.id as string | undefined;
+  return organization?.id
+    ? { id: String(organization.id), approved: Boolean(organization.approved) }
+    : undefined;
 }
 
 function optionalString(value: FormDataEntryValue | null) {

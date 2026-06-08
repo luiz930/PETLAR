@@ -73,7 +73,7 @@ export default function AdopterDashboardPage() {
           <h2 className="text-2xl font-black text-[#18392f]">{profile.name}</h2>
           <p className="text-[#52665a]">{profile.email}{profile.city ? ` · ${profile.city}` : ""}</p>
         </div>
-        <Link href="/cadastro" className="btn-secondary md:ml-auto">
+        <Link href="/configuracoes/perfil" className="btn-secondary md:ml-auto">
           Editar perfil básico
         </Link>
       </section>

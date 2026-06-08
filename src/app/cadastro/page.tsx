@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { HeartHandshake } from "lucide-react";
-import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client";
+import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import type { UserRole } from "@/data/domain";
 
 export default function CadastroPage() {
@@ -27,7 +27,7 @@ export default function CadastroPage() {
       return;
     }
 
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { name, role } },
@@ -37,15 +37,6 @@ export default function CadastroPage() {
     if (error) {
       setMessage(error.message);
       return;
-    }
-
-    if (data.session && data.user) {
-      await supabase.from("profiles").upsert({
-        id: data.user.id,
-        name,
-        email,
-        role,
-      });
     }
 
     router.push("/login?cadastro=ok");
@@ -59,7 +50,6 @@ export default function CadastroPage() {
         <p className="mt-2 text-sm leading-6 text-[#52665a]">
           Escolha o perfil que representa sua participação na plataforma.
         </p>
-        {!isSupabaseConfigured && null}
         <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
           <label className="label">
             Nome

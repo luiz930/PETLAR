@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { AlertTriangle, Filter, MapPin, Plus, Search } from "lucide-react";
+import { AlertTriangle, Filter, MapPin, Plus, RotateCcw, Search } from "lucide-react";
 import { PetLocationCard } from "@/components/pet-location-card";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 import {
@@ -70,6 +70,16 @@ export default function MapaPetPage() {
     });
   }, [category, locations, only24h, onlyAffordable, onlyEmergency, search]);
 
+  const hasFilters = Boolean(search.trim() || category !== all || only24h || onlyEmergency || onlyAffordable);
+
+  function clearFilters() {
+    setSearch("");
+    setCategory(all);
+    setOnly24h(false);
+    setOnlyEmergency(false);
+    setOnlyAffordable(false);
+  }
+
   return (
     <div className="container-page py-10">
       <div className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end">
@@ -119,16 +129,22 @@ export default function MapaPetPage() {
         <Toggle label="Atendimento 24h" checked={only24h} onChange={setOnly24h} />
         <Toggle label="Emergência" checked={onlyEmergency} onChange={setOnlyEmergency} />
         <Toggle label="Gratuito/popular" checked={onlyAffordable} onChange={setOnlyAffordable} />
+        {hasFilters && (
+          <button className="btn-secondary lg:col-span-5" type="button" onClick={clearFilters}>
+            <RotateCcw aria-hidden size={18} />
+            Limpar filtros
+          </button>
+        )}
       </section>
 
       <section className="mb-7 rounded-lg border border-[#dbe6dc] bg-white p-4">
         <h2 className="flex items-center gap-2 text-lg font-black text-[#18392f]">
           <MapPin aria-hidden size={20} />
-          Visualização rápida
+          Encontre apoio com segurança
         </h2>
         <p className="mt-2 leading-7 text-[#52665a]">
-          O MVP prioriza dados revisáveis e botões de rota. Locais com latitude e longitude já ficam preparados para
-          uma integração futura com Leaflet ou outro mapa gratuito.
+          Use os filtros para localizar serviços revisados e abra a rota no Google Maps. Confirme o atendimento
+          diretamente com o local antes de sair.
         </p>
       </section>
 
@@ -142,10 +158,18 @@ export default function MapaPetPage() {
         <div className="surface p-8 text-center">
           <Filter aria-hidden className="mx-auto mb-3 text-[#0f766e]" size={34} />
           <h2 className="text-2xl font-black text-[#18392f]">
-            {loading ? "Carregando locais..." : "Nenhum local encontrado com esses filtros."}
+            {loading
+              ? "Carregando locais..."
+              : hasFilters
+                ? "Nenhum local encontrado com esses filtros."
+                : "Nenhum local publicado ainda."}
           </h2>
           <p className="mt-2 text-[#52665a]">
-            {loading ? "Buscando dados do Mapa Pet." : "Tente limpar filtros ou sugerir um novo local para revisão."}
+            {loading
+              ? "Buscando dados do Mapa Pet."
+              : hasFilters
+                ? "Limpe os filtros ou sugira um novo local para revisão."
+                : "Sugira um local real para que a administração possa revisar e publicar."}
           </p>
         </div>
       )}

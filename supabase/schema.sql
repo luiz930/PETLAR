@@ -182,7 +182,11 @@ begin
     new.id,
     coalesce(new.raw_user_meta_data->>'name', 'Usuário PetLar'),
     coalesce(new.email, ''),
-    coalesce(new.raw_user_meta_data->>'role', 'adotante')
+    case
+      when new.raw_user_meta_data->>'role' in ('adotante', 'ong', 'lar_temporario')
+        then new.raw_user_meta_data->>'role'
+      else 'adotante'
+    end
   );
   return new;
 end;
@@ -200,6 +204,23 @@ as $$
     from public.profiles
     where id = auth.uid() and role = 'admin'
   );
+$$;
+
+create or replace function public.set_organization_approval(organization_id uuid, next_approved boolean)
+returns void
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if not public.is_admin() then
+    raise exception 'Apenas administradores podem revisar organizacoes.';
+  end if;
+
+  update public.organizations
+  set approved = next_approved
+  where id = organization_id;
+end;
 $$;
 
 drop trigger if exists on_auth_user_created on auth.users;
@@ -221,6 +242,7 @@ drop policy if exists "profiles_insert_own" on public.profiles;
 drop policy if exists "profiles_update_own" on public.profiles;
 drop policy if exists "organizations_public_approved" on public.organizations;
 drop policy if exists "organizations_owner_select" on public.organizations;
+drop policy if exists "organizations_admin_select" on public.organizations;
 drop policy if exists "organizations_owner_insert" on public.organizations;
 drop policy if exists "organizations_owner_update" on public.organizations;
 drop policy if exists "pets_public_available" on public.pets;
@@ -249,7 +271,10 @@ create policy "profiles_admin_select" on public.profiles
 for select using (public.is_admin());
 
 create policy "profiles_insert_own" on public.profiles
-for insert with check (auth.uid() = id);
+for insert with check (
+  auth.uid() = id
+  and role in ('adotante', 'ong', 'lar_temporario')
+);
 
 create policy "profiles_update_own" on public.profiles
 for update using (auth.uid() = id) with check (auth.uid() = id);
@@ -260,8 +285,11 @@ for select using (approved = true);
 create policy "organizations_owner_select" on public.organizations
 for select using (auth.uid() = user_id);
 
+create policy "organizations_admin_select" on public.organizations
+for select using (public.is_admin());
+
 create policy "organizations_owner_insert" on public.organizations
-for insert with check (auth.uid() = user_id);
+for insert with check (auth.uid() = user_id and approved = false);
 
 create policy "organizations_owner_update" on public.organizations
 for update using (auth.uid() = user_id) with check (auth.uid() = user_id);
@@ -409,16 +437,16 @@ for select using (bucket_id = 'pet-images');
 
 create policy "pet_images_storage_authenticated_upload" on storage.objects
 for insert to authenticated
-with check (bucket_id = 'pet-images');
+with check (bucket_id = 'pet-images' and (storage.foldername(name))[1] = auth.uid()::text);
 
 create policy "pet_images_storage_authenticated_update" on storage.objects
 for update to authenticated
-using (bucket_id = 'pet-images')
-with check (bucket_id = 'pet-images');
+using (bucket_id = 'pet-images' and (storage.foldername(name))[1] = auth.uid()::text)
+with check (bucket_id = 'pet-images' and (storage.foldername(name))[1] = auth.uid()::text);
 
 create policy "pet_images_storage_authenticated_delete" on storage.objects
 for delete to authenticated
-using (bucket_id = 'pet-images');
+using (bucket_id = 'pet-images' and (storage.foldername(name))[1] = auth.uid()::text);
 
 create policy "profile_avatars_storage_public_read" on storage.objects
 for select using (bucket_id = 'profile-avatars');
@@ -435,3 +463,15 @@ with check (bucket_id = 'profile-avatars' and (storage.foldername(name))[1] = au
 create policy "profile_avatars_storage_authenticated_delete" on storage.objects
 for delete to authenticated
 using (bucket_id = 'profile-avatars' and (storage.foldername(name))[1] = auth.uid()::text);
+
+revoke update on public.profiles from authenticated;
+grant update (name, email, avatar_url, phone, city, state) on public.profiles to authenticated;
+
+revoke update on public.organizations from authenticated;
+grant update (name, type, description, city, state, whatsapp, email, instagram) on public.organizations to authenticated;
+
+revoke update on public.adoption_applications from authenticated;
+grant update (status) on public.adoption_applications to authenticated;
+
+revoke all on function public.set_organization_approval(uuid, boolean) from public;
+grant execute on function public.set_organization_approval(uuid, boolean) to authenticated;

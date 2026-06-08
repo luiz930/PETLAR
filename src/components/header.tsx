@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { HeartHandshake, LogIn, LogOut, PawPrint, UserRound } from "lucide-react";
+import { HeartHandshake, LayoutDashboard, LogIn, LogOut, PawPrint, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
-import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import { getSupabaseBrowserClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
 const navItems = [
   { href: "/pets", label: "Pets" },
@@ -17,7 +17,7 @@ const navItems = [
 
 export function Header() {
   const [user, setUser] = useState<{ name: string; email: string; role?: string; avatarUrl?: string } | null>(null);
-  const [checkedSession, setCheckedSession] = useState(false);
+  const [checkedSession, setCheckedSession] = useState(!isSupabaseConfigured);
 
   useEffect(() => {
     const supabase = getSupabaseBrowserClient();
@@ -63,6 +63,13 @@ export function Header() {
     window.location.href = "/";
   }
 
+  const dashboardHref =
+    user?.role === "ong"
+      ? "/dashboard/ong"
+      : user?.role === "admin"
+        ? "/dashboard/admin/locais"
+        : "/dashboard/adotante";
+
   return (
     <header className="sticky top-0 z-40 border-b border-[#dbe6dc] bg-[#fffaf3]/95 backdrop-blur">
       <div className="container-page flex min-h-16 flex-wrap items-center justify-between gap-3 py-3">
@@ -85,6 +92,10 @@ export function Header() {
           <div className="h-11 w-48 rounded-lg border border-[#dbe6dc] bg-white/70" aria-label="Carregando sessão" />
         ) : user ? (
           <div className="flex items-center gap-2">
+            <Link href={dashboardHref} className="btn-secondary px-3 text-sm">
+              <LayoutDashboard aria-hidden size={17} />
+              <span className="hidden sm:inline">Painel</span>
+            </Link>
             <Link
               href="/configuracoes/perfil"
               className="flex min-h-11 items-center gap-3 rounded-lg border border-[#c9d8ce] bg-white px-3 text-left"
@@ -118,6 +129,14 @@ export function Header() {
             </Link>
           </div>
         )}
+
+        <nav className="order-3 flex w-full gap-4 overflow-x-auto border-t border-[#dbe6dc] pt-3 text-sm font-bold text-[#355044] lg:hidden">
+          {navItems.map((item) => (
+            <Link key={item.href} href={item.href} className="shrink-0 hover:text-[#0f766e]">
+              {item.label}
+            </Link>
+          ))}
+        </nav>
       </div>
     </header>
   );

@@ -3,11 +3,11 @@
 ## 1. Como criar conta
 Acesse `Criar conta`, informe nome, e-mail, senha e selecione o perfil `ONG/protetor`.
 
-## 2. Como cadastrar a ONG ou perfil de protetor
-Após o cadastro, preencha nome público, tipo de atuação, cidade, UF, WhatsApp, e-mail, descrição e redes sociais opcionais.
+## 2. Como validar a ONG ou perfil de protetor
+Após o cadastro, o primeiro pet pode ser registrado, mas a ONG ou protetor entra como pendente. A administração valida o responsável antes de publicar os animais para visitantes.
 
 ## 3. Como cadastrar um pet
-Entre no painel da ONG, clique em `Cadastrar novo pet` e preencha identificação, localização, saúde, temperamento, história do resgate e status.
+Entre no painel da ONG, clique em `Cadastrar novo pet` e preencha identificação, localização, saúde, temperamento, história do resgate e status. Enquanto a ONG ou protetor estiver pendente, o pet permanece visível no painel interno e não aparece no catálogo público.
 
 ## 4. Como adicionar boas fotos
 Use fotos claras, bem iluminadas e atuais. Mostre rosto, corpo inteiro e porte aproximado. Evite imagens com dados pessoais, placas, endereço ou pessoas identificáveis sem autorização.
